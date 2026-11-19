@@ -32,11 +32,7 @@ PROJEK_UAS/
 │   └── index.html              # Halaman antarmuka pengguna (HTML + Jinja2)
 ├── static/
 │   └── css/
-│       └── style.css           # Desain tampilan antarmuka (CSS)
-├── docs/
-│   ├── Mini Proposal.md        # Dokumen Mini Proposal proyek
-│   ├── MOCKUP_KELOMPOK1.pdf    # Desain mockup tampilan aplikasi
-│   └── Tugas Project Kecerdasan Buatan 2026.pdf
+│       └── style.css           # Desain tampilan antarmuka (CSS) 
 └── x_comment_scraper/
     ├── buat_berkas_label.py    # Skrip pembuat berkas Excel pelabelan tanpa identitas penulis
     ├── pelabelan_komentar.xlsx # Lembar kerja pelabelan 100 komentar uji tambahan (tanpa username)
