@@ -53,7 +53,7 @@ Pastikan komputer sudah terpasang **Python 3.10 atau lebih baru**.
 ### B. Langkah Instalasi
 1. **Clone repositori ini** (atau unduh dan ekstrak folder proyek):
    ```bash
-   git clone <url-repository-github-anda>
+   git clone https://github.com/andimuhammadyusranharis/Sistem-Deteksi-Komentar-Hinaan.git
    cd PROJEK_UAS
    ```
 
@@ -111,9 +111,9 @@ Proyek ini dikerjakan oleh 3 anggota kelompok dengan pembagian tanggung jawab se
 
 | Anggota | Peran & Tanggung Jawab | Berkas Utama yang Dikerjakan |
 | :--- | :--- | :--- |
-| **Anggota 1**<br>*(Data & Model AI)* | 1. Menyiapkan dataset publik dan kamus kata gaul/kasar.<br>2. Menyusun fungsi praproses teks (`bersihkan_teks`) dan ekstraksi fitur TF-IDF.<br>3. Melatih model `MLPClassifier` dan menyimpan artefak model. | `train_jst.py`, `re_dataset.csv`, `new_kamusalay.csv`, `abusive.csv`, `model_jst.joblib` |
-| **Anggota 2**<br>*(Aplikasi Web & UI)* | 1. Membangun backend Flask, rute halaman, dan validasi masukan (`validasi_masukan`).<br>2. Mengimplementasikan fungsi prediksi dan penjelasan pengaruh kata (`analisis_komentar`).<br>3. Merancang antarmuka HTML dan CSS sesuai mockup. | `app.py`, `templates/index.html`, `static/css/style.css` |
-| **Anggota 3**<br>*(Pengujian & Dokumentasi)* | 1. Mengoordinasikan pelabelan 100 komentar uji tambahan oleh dua pelabel.<br>2. Melakukan pengujian skenario masukan tidak valid dan analisis kesalahan prediksi model.<br>3. Menyusun proposal, laporan akhir, README, dan bahan presentasi. | `x_comment_scraper/pelabelan_komentar.xlsx`, `docs/Mini Proposal.md`, `README.md` |
+| **Andi Muh Yusran Haris/250210501003**<br>*(Data & Model AI)* | 1. Menyiapkan dataset publik dan kamus kata gaul/kasar.<br>2. Menyusun fungsi praproses teks (`bersihkan_teks`) dan ekstraksi fitur TF-IDF.<br>3. Melatih model `MLPClassifier` dan menyimpan artefak model. | `train_jst.py`, `re_dataset.csv`, `new_kamusalay.csv`, `abusive.csv`, `model_jst.joblib` |
+| **Muh Fathir Alma Arijs/250210501052**<br>*(Aplikasi Web & UI)* | 1. Membangun backend Flask, rute halaman, dan validasi masukan (`validasi_masukan`).<br>2. Mengimplementasikan fungsi prediksi dan penjelasan pengaruh kata (`analisis_komentar`).<br>3. Merancang antarmuka HTML dan CSS sesuai mockup. | `app.py`, `templates/index.html`, `static/css/style.css` |
+| **Ade Irmawati/250210500017**<br>*(Pengujian & Dokumentasi)* | 1. Mengoordinasikan pelabelan 100 komentar uji tambahan oleh dua pelabel.<br>2. Melakukan pengujian skenario masukan tidak valid dan analisis kesalahan prediksi model.<br>3. Menyusun proposal, laporan akhir, README, dan bahan presentasi. | `x_comment_scraper/pelabelan_komentar.xlsx`, `docs/Mini Proposal.md`, `README.md` |
 
 > **Catatan Akademik:** Setiap anggota kelompok memahami keseluruhan alur kode (`train_jst.py` dan `app.py`) untuk keperluan presentasi dan tanya jawab individual.
 
