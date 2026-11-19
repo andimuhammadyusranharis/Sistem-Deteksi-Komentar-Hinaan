@@ -1,0 +1,25 @@
+# Folder cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Data sensitif & sesi browser scraper (JANGAN di-upload ke GitHub publik)
+x_comment_scraper/chrome_profile/
+x_comment_scraper/komentar.csv
+x_comment_scraper/komentar.xlsx
+
+docs/
+
+# File sistem operasi & editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+~$*.xlsx
+~$*.docx

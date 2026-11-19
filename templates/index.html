@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Deteksi Komentar Hinaan Menggunakan Jaringan Syaraf Tiruan</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="header-bar">
+        <div class="header-inner">Sistem Deteksi Komentar Hinaan Menggunakan Jaringan Syaraf Tiruan</div>
+    </div>
+
+    <div class="container">
+        <h1>Periksa Komentar</h1>
+
+        <!-- Form Input Komentar -->
+        <div class="card">
+            <form method="POST" action="/">
+                <label class="form-label" for="komentar">Tulis atau tempel komentar</label>
+                <textarea id="komentar" name="komentar" maxlength="500"
+                    placeholder="Contoh: Menteri itu goblok dan tidak berguna."
+                    oninput="updateCounter()">{{ komentar }}</textarea>
+                <div class="input-meta">
+                    <span>Minimal 3 kata, Hanya untuk komentar berbahasa Indonesia</span>
+                    <span id="char-count">{{ komentar|length }} / 500</span>
+                </div>
+                <div class="btn-row">
+                    <a href="/" class="btn btn-clear">Hapus</a>
+                    <button type="submit" class="btn btn-submit">Analisis komentar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tampilan Jika Masukan Tidak Valid -->
+        {% if pesan_error %}
+        <div class="error-box">
+            <strong>Masukan tidak dapat diproses:</strong> {{ pesan_error }}
+        </div>
+        {% endif %}
+
+        <!-- Tampilan Hasil Analisis JST -->
+        {% if hasil %}
+        <div class="card {% if hasil.menghina %}card-menghina{% else %}card-bukan{% endif %}">
+            <div class="result-top">
+                <div class="result-left">
+                    {% if hasil.menghina %}
+                    <div class="icon-circle icon-menghina">&#9888;</div>
+                    <div>
+                        <div class="small-tag">HASIL ANALISIS</div>
+                        <div class="result-title text-menghina">Menghina</div>
+                        <div class="result-desc">Komentar ini terdeteksi mengandung bahasa yang menghina.</div>
+                    </div>
+                    {% else %}
+                    <div class="icon-circle icon-bukan">&#10003;</div>
+                    <div>
+                        <div class="small-tag">HASIL ANALISIS</div>
+                        <div class="result-title text-bukan">Bukan Menghina</div>
+                        <div class="result-desc">Komentar ini tidak terdeteksi mengandung bahasa yang menghina.</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="result-right">
+                    <div class="score-label">Skor model</div>
+                    <div class="score-value">{{ hasil.skor_teks }}</div>
+                    {% if hasil.menghina %}
+                    <span class="badge badge-menghina">Di atas ambang batas 0,50</span>
+                    {% else %}
+                    <span class="badge badge-bukan">Di bawah ambang batas</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="bar-wrapper">
+                <div class="bar-track">
+                    <div class="{% if hasil.menghina %}bar-fill-menghina{% else %}bar-fill-bukan{% endif %}"
+                        style="width: {{ hasil.persen_bar }}%;"></div>
+                </div>
+                <div class="threshold-marker"></div>
+                <div class="bar-labels">
+                    <span>0,00</span>
+                    <span>Ambang batas 0,50</span>
+                    <span>1,00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2 Kartu Penjelasan Hasil: Kata Terdeteksi & Pengaruh Terbesar -->
+        <div class="grid-2">
+            <div class="card" style="margin-bottom: 0;">
+                <div class="box-label">Kata terdeteksi</div>
+                {% if hasil.kata_kasar %}
+                <div class="box-main text-menghina">{{ hasil.kata_kasar | join(', ') }}</div>
+                <div class="box-note">Ditemukan dalam daftar kata kasar (abusive.csv).</div>
+                {% else %}
+                <div class="box-main">Tidak ditemukan</div>
+                <div class="box-note">Tidak ada kecocokan pada daftar kata kasar</div>
+                {% endif %}
+            </div>
+
+            <div class="card" style="margin-bottom: 0;">
+                <div class="box-label">Pengaruh terbesar</div>
+                {% if hasil.kata_pengaruh and (hasil.menghina or hasil.pengaruh_positif) %}
+                <div class="box-main">{{ hasil.kata_pengaruh }} ({{ hasil.nilai_pengaruh }})</div>
+                <div class="box-note">Kata yang paling memengaruhi skor model.</div>
+                {% else %}
+                <div class="box-main">&mdash;</div>
+                <div class="box-note">Tidak ada kata pendorong skor hinaan yang menonjol.</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="box-note" style="margin-top: -4px; margin-bottom: 16px;">
+            Catatan: Hasil ini merupakan bantuan analisis awal berdasarkan pola kata pada data latih, bukan putusan mutlak. Kelas Bukan Menghina mencakup komentar netral atau topik umum dan tidak selalu berarti kritik konstruktif.
+        </div>
+        {% endif %}
+
+        <hr class="section-divider">
+
+        <!-- Bagian Bawah: Informasi & Evaluasi Model -->
+        <h2>Informasi &amp; evaluasi model</h2>
+        <div class="subtitle">Kenali data, arsitektur, dan hasil pengujian yang mendasari pemeriksaan komentar.</div>
+
+        <div class="grid-3">
+            <div class="card" style="margin-bottom: 0;">
+                <div class="box-label">Data bersih</div>
+                <div class="stat-number">{{ "{:,}".format(info.data_bersih).replace(",", ".") }}</div>
+                <div class="box-note">komentar dalam dataset</div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+                <div class="box-label">Akurasi data uji</div>
+                <div class="stat-number stat-blue">{{ (info.akurasi|string).replace(".", ",") }}%</div>
+                <div class="box-note">hasil pengujian model</div>
+            </div>
+            <div class="card" style="margin-bottom: 0;">
+                <div class="box-label">Baseline</div>
+                <div class="stat-number">{{ (info.baseline|string).replace(".", ",") }}%</div>
+                <div class="box-note">pembanding performa model</div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Matriks Evaluasi -->
+            <div class="card" style="margin-bottom: 0;">
+                <div class="arch-title" style="font-size: 15px; margin-bottom: 2px;">Matriks evaluasi</div>
+                <div class="box-note" style="margin-bottom: 10px;">Perbandingan label sebenarnya dan prediksi model.</div>
+                <table class="cm-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Label sebenarnya</th>
+                            <th>Prediksi<br>bukan menghina</th>
+                            <th>Prediksi<br>menghina</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="cm-row-label">Bukan menghina</td>
+                            <td class="cm-cell cm-correct">{{ "{:,}".format(info.tn).replace(",", ".") }}</td>
+                            <td class="cm-cell cm-wrong">{{ "{:,}".format(info.fp).replace(",", ".") }}</td>
+                        </tr>
+                        <tr>
+                            <td class="cm-row-label">Menghina</td>
+                            <td class="cm-cell cm-wrong">{{ "{:,}".format(info.fn).replace(",", ".") }}</td>
+                            <td class="cm-cell cm-correct">{{ "{:,}".format(info.tp).replace(",", ".") }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Arsitektur Model -->
+            <div class="card" style="margin-bottom: 0;">
+                <div class="arch-title" style="font-size: 15px; margin-bottom: 6px;">Arsitektur model</div>
+
+                <div class="arch-item">
+                    <div class="arch-badge">01</div>
+                    <div>
+                        <div class="arch-title">3.000 fitur TF-IDF</div>
+                        <div class="arch-sub">Representasi teks komentar</div>
+                    </div>
+                </div>
+
+                <div class="arch-item">
+                    <div class="arch-badge">02</div>
+                    <div>
+                        <div class="arch-title">Hidden layer: 16 neuron</div>
+                        <div class="arch-sub">Fungsi aktivasi sigmoid</div>
+                    </div>
+                </div>
+
+                <div class="arch-item">
+                    <div class="arch-badge">03</div>
+                    <div>
+                        <div class="arch-title">1 neuron keluaran</div>
+                        <div class="arch-sub">Skor klasifikasi komentar</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-note" style="text-align: center; margin-top: 28px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+            Kredit Dataset: <strong>Muhammad Okky Ibrohim &amp; Indra Budi (2019)</strong> &mdash;
+            <em>Multi-label Hate Speech and Abusive Language Detection in Indonesian Twitter</em> (ACL 2019, Lisensi CC BY-NC-SA 4.0).
+        </div>
+
+    </div>
+
+    <script>
+        function updateCounter() {
+            var ta = document.getElementById("komentar");
+            var count = document.getElementById("char-count");
+            count.textContent = ta.value.length + " / 500";
+        }
+    </script>
+</body>
+</html>
